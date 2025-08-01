@@ -94,10 +94,10 @@ module_param(quota_autotune_feedback, ulong, 0600);
 
 static struct damos_watermarks damon_reclaim_wmarks = {
 	.metric = DAMOS_WMARK_FREE_MEM_RATE,
-	.interval = 5000000,	/* 5 seconds */
+	.interval = 10000000,	/* 10 seconds */
 	.high = 500,		/* 50 percent */
-	.mid = 400,		/* 40 percent */
-	.low = 200,		/* 20 percent */
+	.mid = 300,		/* 30 percent */
+	.low = 100,		/* 10 percent */
 };
 DEFINE_DAMON_MODULES_WMARKS_PARAMS(damon_reclaim_wmarks);
 
