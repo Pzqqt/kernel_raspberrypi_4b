@@ -1,0 +1,42 @@
+name: Build glow Kernel (for rpi 4b)
+
+on:
+  push:
+    branches: [rpi-6.18.y-glow-ci]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore Slim LLVM
+        id: slim-llvm-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/build_toolchain/llvm-23.1.1-x86_64.tar.xz
+          key: llvm-23.1.1-x86_64
+      - name: Download Slim LLVM
+        if: steps.slim-llvm-cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt install -y aria2
+          
+          echo "Downloading Slim LLVM..."
+          mkdir -p ~/build_toolchain
+          cd ~/build_toolchain
+          aria2c https://mirrors.edge.kernel.org/pub/tools/llvm/files/llvm-23.1.1-x86_64.tar.xz
+      - name: Prepare the environment
+        run: |
+          cd ~/build_toolchain
+          tar -xJf ./llvm-23.1.1-x86_64.tar.xz
+      - name: Check out
+        uses: actions/checkout@v7
+        with:
+          ref: "rpi-6.18.y-glow-ci"
+      - name: Build kernel Image & modules
+        run: |
+          cd $GITHUB_WORKSPACE
+          ./build_rpi_kernel.sh
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          path: ~/kr4b_release
+          if-no-files-found: error
